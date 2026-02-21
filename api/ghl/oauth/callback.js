@@ -1,37 +1,41 @@
 export default async function handler(req, res) {
   try {
-    // Parámetros que GHL enviará al redirect
-    const { code, state, error, error_description } = req.query || {};
+    const { code } = req.query;
 
-    // Si el usuario canceló o hubo error en OAuth
-    if (error) {
-      return res.status(400).json({
-        ok: false,
-        error,
-        error_description: error_description || null,
-      });
-    }
-
-    // Si no hay code, el endpoint fue llamado manualmente
     if (!code) {
-      return res.status(400).json({
-        ok: false,
-        message: "Missing required query param: code",
-      });
+      return res.status(400).json({ error: "Missing code" });
     }
 
-    // ✔️ Confirmamos que el callback funciona
+    const body = new URLSearchParams({
+      client_id: process.env.GHL_CLIENT_ID,
+      client_secret: process.env.GHL_CLIENT_SECRET,
+      grant_type: "authorization_code",
+      code,
+      user_type: "Company",
+    });
+
+    const response = await fetch(
+      "https://services.leadconnectorhq.com/oauth/token",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+        },
+        body,
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("TOKENS:", data);
+
     return res.status(200).json({
       ok: true,
-      message: "OAuth callback received successfully",
-      code_received: true,
-      state: state || null,
+      message: "OAuth successful",
     });
 
-  } catch (e) {
-    return res.status(500).json({
-      ok: false,
-      error: String(e?.message || e),
-    });
+  } catch (error) {
+    return res.status(500).json({ error: String(error) });
   }
 }
