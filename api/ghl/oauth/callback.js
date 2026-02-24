@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     params.append('code', code);
     params.append('user_type', 'Company'); // Required for Agency-level apps
 
-    const response = await axios.post('https://services.leadconnectorhq.com', params, {
+    const response = await axios.post('https://services.leadconnectorhq.com/oauth/token', params, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
 
