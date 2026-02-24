@@ -1,0 +1,14 @@
+{
+  "crons": [
+    {
+      "path": "/api/keep-alive",
+      "schedule": "0 0 * * *"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/ghl/oauth/callback",
+      "destination": "/api/ghl/oauth/callback.js"
+    }
+  ]
+}
