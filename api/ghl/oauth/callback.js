@@ -1,7 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import axios from 'axios';
 
-const supabase = createClient(process.env.DATABASE_URL, process.env.PASSWORD); // 'PASSWORD' is your Supabase Service Role Key
+const supabase = createClient(
+  process.env.DATABASE_URL, 
+  process.env.DATABASE_SERVICE_KEY
+);
 
 export default async function handler(req, res) {
   const { code } = req.query;
