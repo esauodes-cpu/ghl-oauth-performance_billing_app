@@ -1,5 +1,3 @@
-Here's the code, how can we fix it?
-
 import { createClient } from '@supabase/supabase-js';
 import axios from 'axios';
 
