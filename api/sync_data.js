@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   // Seguridad
   if (service_key !== process.env.DATABASE_SERVICE_KEY) {
-    return res.status(401).json({ error: "Unauthorized: Service Key mismatch" });
+    return res.status(401).json({ error: "Unauthorized: Service Key Mismatch" });
   }
 
   try {
