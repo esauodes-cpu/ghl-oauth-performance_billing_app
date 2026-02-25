@@ -65,7 +65,7 @@ export default async function handler(req, res) {
 
     // Obtener Custom Values
     const customValues = await axios.get(
-      `https://services.leadconnectorhq.com/locations/${locationId}/custom-values`,
+      `https://services.leadconnectorhq.com/locations/${locationId}/customValues`,
       {
         headers: {
           Authorization: `Bearer ${locRes.data.access_token}`,
