@@ -1,3 +1,5 @@
+Here's the code, how can we fix it?
+
 import { createClient } from '@supabase/supabase-js';
 import axios from 'axios';
 
@@ -10,7 +12,7 @@ export default async function handler(req, res) {
   const { locationId, password } = req.body;
 
   // Security Check
-  if (password !== process.env.PASSWORD) return res.status(401).send("Unauthorized");
+  if (password !== process.env.DATABASE_SERVICE_KEY) return res.status(401).send("Unauthorized");
 
   try {
     // 1. Get current Refresh Token from Supabase
