@@ -1,14 +1,14 @@
 {
   "crons": [
     {
-      "path": "/api/keep-alive",
+      "path": "/api/ad-platforms/sync-all",
       "schedule": "0 0 * * *"
     }
   ],
   "rewrites": [
     {
-      "source": "/api/ghl/oauth/callback",
-      "destination": "/api/ghl/oauth/callback.js"
+      "source": "/(.*)",
+      "destination": "/api/$1"
     }
   ]
 }
