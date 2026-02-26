@@ -1,3 +1,6 @@
+//Este código es el redirect url endpoint cuando la aplicación se instala en una agencia. Lo que hace es captar el código de autorización que se genera al instalar la app, lo cambia por el primer par de access+refresh tokens y los guarda en la base de datos
+//Revisado : OK
+
 import { supabase } from '../../utils/supabase.js';
 
 export default async function handler(req, res) {
