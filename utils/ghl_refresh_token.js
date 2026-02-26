@@ -1,3 +1,5 @@
+// Este código refresca los agency tokens en GHL que vencen cada 24 hrs. Revisa la vigencia del token para no renovarlo si no es necesario y así evitar colisiones
+// revisado : ok
 import { supabase } from './supabase.js';
 
 export async function getValidAgencyToken() {
