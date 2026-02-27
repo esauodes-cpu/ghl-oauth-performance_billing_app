@@ -30,7 +30,7 @@ export default async function handler(req, res) {
             return res.json({ total_spend: 0, message: "No managed campaigns found" });
         }
 
-        // Rango de 28 días
+        // Rango de 28 días (corregir, basta con date_preset = last_28d)
         const until = new Date().toISOString().split('T')[0];
         const since = new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
