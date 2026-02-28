@@ -115,3 +115,15 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 }
+
+
+// Sample Body Request
+// {
+//  "locationId": "string",
+//  "updates": [
+//    {
+//      "name": "string",
+//      "value": "any"
+//    }
+//  ]
+// }
