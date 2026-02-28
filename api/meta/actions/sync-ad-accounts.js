@@ -1,4 +1,4 @@
-import supabase from '../../supabase.js';
+import supabase from '../../_supabase.js';
 import { getPlatformAccessToken } from '../../auth-manager.js';
 
 export default async function syncAdAccounts({ locationId }) {
