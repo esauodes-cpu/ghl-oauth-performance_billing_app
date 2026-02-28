@@ -2,14 +2,15 @@
   "name": "ghl-oauth-performance-billing-app",
   "version": "1.0.0",
   "description": "Backend para Performance Billing en GHL y Meta Ads",
-  "main": "index.js",
+  "type": "module",
+  "main": "api/auth-manager.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node api/auth-manager.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0"
   },
   "engines": {
-    "node": "24.x"
+    "node": "20.x"
   }
 }
