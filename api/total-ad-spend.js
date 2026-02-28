@@ -9,7 +9,15 @@ export default async function handler(req, res) {
     if (!authHeader || authHeader !== `Bearer ${process.env.CUSTOM_WEBHOOK_TOKEN}`) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    
+
+    const { locationId } = req.body;
+
+    if (!locationId) {
+      return res.status(400).json({ error: 'locationId is required' });
+    }
+
+    // 🔄 Asegurar DB actualizada antes del cálculo
+    // Llama a sync-all para sincronizar activos, cuentas y campañas
     await fetch(`${process.env.PROJECT_URL}/api/sync-all`, {
       method: 'POST',
       headers: {
@@ -17,12 +25,6 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       }
     });
-
-    const { locationId } = req.body;
-
-    if (!locationId) {
-      return res.status(400).json({ error: 'locationId is required' });
-    }
 
     // 1️⃣ Obtener campañas atribuibles
     const { data: campaigns, error } = await supabase
