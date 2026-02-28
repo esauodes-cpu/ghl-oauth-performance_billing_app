@@ -1,5 +1,5 @@
 // api/sync-all.js
-import supabase from './supabase.js';
+import supabase from './_supabase.js';
 
 export default async function handler(req, res) {
   try {
