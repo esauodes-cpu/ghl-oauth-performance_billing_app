@@ -1,16 +1,35 @@
-import { getAccessToken } from '../../auth-manager.js';
+// api/meta/actions/get-ad-spend.js
+import { getPlatformAccessToken } from '../../auth-manager.js';
 
-export const getAdSpend = async (adAccountId) => {
-  const token = await getAccessToken('meta');
-  const params = new URLSearchParams({
-    fields: 'campaign_id,spend',
-    date_preset: 'last_28d',
-    level: 'campaign',
-    access_token: token
-  });
+export default async function getAdSpend({ campaignIds }) {
+  if (!campaignIds?.length) return 0;
 
-  const response = await fetch(`https://graph.facebook.com{adAccountId}/insights?${params}`);
+  const token = await getPlatformAccessToken('meta');
+
+  const url = `https://graph.facebook.com/v19.0/`;
+
+  const response = await fetch(
+    `${url}?ids=${campaignIds.join(',')}&fields=insights{spend}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Meta API error: ${errText}`);
+  }
+
   const data = await response.json();
-  
-  return data.data; // [{ campaign_id: "...", spend: "123.45" }]
-};
+
+  let total = 0;
+
+  for (const id of campaignIds) {
+    const spend = Number(data[id]?.insights?.data?.[0]?.spend || 0);
+    total += spend;
+  }
+
+  return total;
+}
