@@ -1,5 +1,5 @@
 // api/ghl/auth/get-access-token.js
-import supabase from '../../supabase.js';
+import supabase from '../../_supabase.js';
 
 const GHL_BASE_URL = 'https://services.leadconnectorhq.com';
 const TEN_MINUTES = 10 * 60 * 1000;
