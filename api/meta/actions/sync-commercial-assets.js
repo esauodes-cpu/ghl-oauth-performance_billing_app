@@ -1,5 +1,5 @@
 // api/meta/actions/sync-commercial-assets.js
-import supabase from '../../supabase.js';
+import supabase from '../../_supabase.js';
 import { getPlatformAccessToken } from '../../auth-manager.js';
 
 export default async function syncCommercialAssets({ locationId }) {
