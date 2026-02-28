@@ -9,6 +9,14 @@ export default async function handler(req, res) {
     if (!authHeader || authHeader !== `Bearer ${process.env.CUSTOM_WEBHOOK_TOKEN}`) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
+    
+    await fetch(`${process.env.PROJECT_URL}/api/sync-all`, {
+      method: 'POST',
+      headers: {
+        Authorization: req.headers.authorization,
+        'Content-Type': 'application/json'
+      }
+    });
 
     const { locationId } = req.body;
 
