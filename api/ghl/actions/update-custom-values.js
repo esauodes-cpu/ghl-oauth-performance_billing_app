@@ -1,17 +1,17 @@
+// api/ghl/actions/update-custom-values.js
 import { getPlatformAccessToken } from '../../auth-manager.js';
 
 const GHL_BASE_URL = 'https://services.leadconnectorhq.com';
 
 export default async function handler(req, res) {
   try {
-    // 🔐 1️⃣ Seguridad: validar CUSTOM_WEBHOOK_TOKEN
+    // 🔐 Seguridad obligatoria
     const authHeader = req.headers.authorization;
 
     if (!authHeader || authHeader !== `Bearer ${process.env.CUSTOM_WEBHOOK_TOKEN}`) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // 2️⃣ Validar body
     const { locationId, updates } = req.body;
 
     if (!locationId) {
@@ -22,17 +22,25 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'updates must be a non-empty array' });
     }
 
-    // 🔑 3️⃣ Obtener token de subcuenta
+    // 🔑 Obtener token GHL
     const token = await getPlatformAccessToken('ghl', { location_id: locationId });
 
-    // 4️⃣ Obtener custom values actuales
+    // 🧠 1️⃣ Extraer nombres únicos
+    const names = [...new Set(updates.map(u => u.name))];
+
+    // 📥 2️⃣ Obtener solo los custom values necesarios
     const currentRes = await fetch(
-      `${GHL_BASE_URL}/locations/${locationId}/customValues`,
+      `${process.env.PROJECT_URL}/api/ghl/actions/get-custom-values`,
       {
+        method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
-          Version: '2021-07-28'
-        }
+          'Content-Type': 'application/json',
+          Authorization: authHeader // 🔁 reenviamos token
+        },
+        body: JSON.stringify({
+          locationId,
+          names
+        })
       }
     );
 
@@ -43,17 +51,16 @@ export default async function handler(req, res) {
 
     const { customValues } = await currentRes.json();
 
-    if (!Array.isArray(customValues)) {
-      throw new Error('Invalid custom values response');
-    }
+    // 🧠 3️⃣ Crear mapa name → id
+    const idMap = new Map(customValues.map(cv => [cv.name, cv.id]));
 
-    // 5️⃣ Actualizar valores por nombre
     const results = [];
 
+    // 🔁 4️⃣ Actualizar valores
     for (const update of updates) {
-      const match = customValues.find(cv => cv.name === update.name);
+      const id = idMap.get(update.name);
 
-      if (!match) {
+      if (!id) {
         results.push({
           name: update.name,
           status: 'not_found'
@@ -62,7 +69,7 @@ export default async function handler(req, res) {
       }
 
       const putRes = await fetch(
-        `${GHL_BASE_URL}/locations/${locationId}/customValues/${match.id}`,
+        `${GHL_BASE_URL}/locations/${locationId}/customValues/${id}`,
         {
           method: 'PUT',
           headers: {
@@ -96,10 +103,10 @@ export default async function handler(req, res) {
       });
     }
 
-    // 6️⃣ Respuesta final
     return res.status(200).json({
       success: true,
       locationId,
+      processed: updates.length,
       results
     });
 
@@ -108,12 +115,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 }
-
-//Formato esperado del webhook
-//{
-//"locationId": "abc123",
-//"updates": [
-//  { "name": "performance_fee", "value": 1500 },
-//  { "name": "last_billing_date", "value": "2026-02-28" }
-//]
-//}
