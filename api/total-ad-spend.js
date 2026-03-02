@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     }
 
     // 🔄 Asegurar DB actualizada SOLO para este cliente
-    await fetch(`${process.env.PROJECT_URL}/api/sync-all`, {
+    const syncRes = await fetch(`${process.env.PROJECT_URL}/api/sync-all`, {
       method: 'POST',
       headers: {
         'Authorization': authHeader, // Reusamos el Bearer token
@@ -26,6 +26,10 @@ export default async function handler(req, res) {
       // ENVIAR EL BODY ES LA CLAVE
       body: JSON.stringify({ locationId }) 
     });
+
+    if (!syncRes.ok){
+      console.warn('[total-ad-spend] Sync warning: La sincronización no fue exitosa. ')
+    }
 
     // 1️⃣ Obtener campañas atribuibles
     const { data: campaigns, error } = await supabase
