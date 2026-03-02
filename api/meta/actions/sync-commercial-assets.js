@@ -7,7 +7,7 @@ export default async function syncCommercialAssets({ locationId }) {
 
   // 1. Consultar a qué negocios de clientes tiene acceso la agencia
   const res = await fetch(
-    `https://graph.facebook.com{agencyId}/client_businesses?fields=id,name`,
+    `https://graph.facebook.com/v25.0/${agencyId}/client_businesses?fields=id,name`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
 
