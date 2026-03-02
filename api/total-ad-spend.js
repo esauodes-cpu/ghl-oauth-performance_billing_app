@@ -16,14 +16,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'locationId is required' });
     }
 
-    // 🔄 Asegurar DB actualizada antes del cálculo
-    // Llama a sync-all para sincronizar activos, cuentas y campañas
+    // 🔄 Asegurar DB actualizada SOLO para este cliente
     await fetch(`${process.env.PROJECT_URL}/api/sync-all`, {
       method: 'POST',
       headers: {
-        Authorization: req.headers.authorization,
+        'Authorization': authHeader, // Reusamos el Bearer token
         'Content-Type': 'application/json'
-      }
+      },
+      // ENVIAR EL BODY ES LA CLAVE
+      body: JSON.stringify({ locationId }) 
     });
 
     // 1️⃣ Obtener campañas atribuibles
