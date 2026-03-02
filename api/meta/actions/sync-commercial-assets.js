@@ -1,63 +1,42 @@
-// api/meta/actions/sync-commercial-assets.js
 import supabase from '../../_supabase.js';
 import { getPlatformAccessToken } from '../../auth-manager.js';
 
 export default async function syncCommercialAssets({ locationId }) {
   const token = await getPlatformAccessToken('meta');
-  const agencyBusinessId = process.env.META_AGENCY_PORTFOLIO_ID;
+  const agencyId = process.env.META_AGENCY_PORTFOLIO_ID;
 
-  // Obtener businesses de clientes donde somos partner
+  // 1. Consultar a qué negocios de clientes tiene acceso la agencia
   const res = await fetch(
-    `https://graph.facebook.com/v21.0/${agencyBusinessId}/client_businesses`,
-    {
-      headers: { Authorization: `Bearer ${token}` }
-    }
+    `https://graph.facebook.com{agencyId}/client_businesses?fields=id,name`,
+    { headers: { Authorization: `Bearer ${token}` } }
   );
 
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Meta client_businesses error: ${errText}`);
-  }
+  const { data: apiBusinesses } = await res.json();
+  if (!apiBusinesses) return { synced: 0 };
 
-  const { data: businesses } = await res.json();
-
-  // IDs desde API
-  const apiIds = businesses.map(b => b.id);
-
-  // Obtener assets actuales
-
+  // 2. Obtener los assets que YA tenemos en DB para este locationId
   const { data: dbAssets } = await supabase
     .from('commercial_assets')
     .select('asset_id')
     .eq('location_id', locationId)
     .eq('platform', 'meta');
 
-  const dbIds = dbAssets.map(a => a.asset_id);
+  const dbIds = new Set(dbAssets?.map(a => a.asset_id) || []);
 
-  const toInsert = apiIds.filter(id => !dbIds.includes(id));
-  const toDelete = dbIds.filter(id => !apiIds.includes(id));
+  // 3. Filtrar: Solo hacemos upsert de los negocios que coinciden con lo que Meta reporta
+  // y que pertenecen a este cliente (basado en lo que ya está en DB o es nuevo)
+  const toUpsert = apiBusinesses
+    .filter(b => dbIds.has(b.id)) // Solo actualizamos los que este cliente ya tiene vinculados
+    .map(b => ({
+      asset_id: b.id,
+      location_id: locationId,
+      platform: 'meta',
+      asset_name: b.name
+    }));
 
-  // Insertar nuevos
-  if (toInsert.length) {
-    await supabase.from('commercial_assets').insert(
-      toInsert.map(id => ({
-        asset_id: id,
-        location_id: locationId,
-        platform: 'meta'
-      }))
-    );
+  if (toUpsert.length) {
+    await supabase.from('commercial_assets').upsert(toUpsert, { onConflict: 'asset_id' });
   }
 
-  // Eliminar revocados
-  if (toDelete.length) {
-    await supabase
-      .from('commercial_assets')
-      .delete()
-      .in('asset_id', toDelete);
-  }
-
-  return {
-    added: toInsert.length,
-    removed: toDelete.length
-  };
+  return { synced: toUpsert.length };
 }
