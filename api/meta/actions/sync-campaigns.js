@@ -10,7 +10,7 @@ export default async function syncCampaigns({ locationId }) {
 
   // 1. Obtener staff de la agencia para validar atribución (actor_id)
   const usersRes = await fetch(
-    `https://graph.facebook.com{agencyId}/business_users?fields=id`,
+    `https://graph.facebook.com/v25.0/${agencyId}/business_users?fields=id`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   const { data: users } = await usersRes.json();
@@ -30,7 +30,7 @@ export default async function syncCampaigns({ locationId }) {
 
     // 3. Consultar campañas creadas recientemente en esta cuenta
     const campaignsRes = await fetch(
-      `https://graph.facebook.com{accountId}/campaigns?fields=id,name&filtering=[{"field":"created_time","operator":"GREATER_THAN","value":${since}}]`,
+      `https://graph.facebook.com/v25.0/${accountId}/campaigns?fields=id,name&date_preset=yesterday`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     const { data: campaigns } = await campaignsRes.json();
@@ -39,7 +39,7 @@ export default async function syncCampaigns({ locationId }) {
     for (const campaign of campaigns) {
       // 4. Verificar el 'actor_id' para confirmar que la agencia creó la campaña
       const activityRes = await fetch(
-        `https://graph.facebook.com{accountId}/activities?item_id=${campaign.id}&event_type=campaign_creation&fields=actor_id`,
+        `https://graph.facebook.com/v25.0/${accountId}/activities?item_id=${campaign.id}&event_type=campaign_creation&fields=actor_id`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const { data: activities } = await activityRes.json();
