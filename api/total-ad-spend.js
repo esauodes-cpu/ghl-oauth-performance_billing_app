@@ -62,7 +62,6 @@ export default async function handler(req, res) {
         const getAdSpend = module.default;
 
         const spend = await getAdSpend({
-          locationId,
           campaignIds: campaignsByPlatform[platform]
         });
 
