@@ -9,12 +9,21 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // 1️⃣ Obtener clientes
-    const { data: clients, error } = await supabase
-      .from('clients')
-      .select('location_id');
+    // 1️⃣ Obtener clientes (Híbrido: Uno o Todos)
+    const { locationId: targetLocationId } = req.body || {};
+    
+    // Preparamos la consulta a Supabase
+    let query = supabase.from('clients').select('location_id');
+
+    // Si recibimos un ID específico, filtramos; si no, trae todos (para el Cron)
+    if (targetLocationId) {
+      query = query.eq('location_id', targetLocationId);
+    }
+
+    const { data: clients, error } = await query;
 
     if (error) throw error;
+    if (!clients.length) return res.status(200).json({ success: true, message: 'No clients to sync' });
 
     const results = [];
 
