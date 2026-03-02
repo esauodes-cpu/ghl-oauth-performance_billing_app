@@ -18,7 +18,7 @@ export default async function syncAdAccounts({ locationId }) {
   // 2. Por cada Business Portfolio, pedir sus cuentas publicitarias
   for (const asset of assets) {
     const res = await fetch(
-      `https://graph.facebook.com{asset.asset_id}/client_ad_accounts?fields=id,name,currency`,
+      `https://graph.facebook.com/v25.0/${asset.asset_id}/client_ad_accounts?fields=id,name,currency`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     
