@@ -1,18 +1,22 @@
 // api/auth-manager.js
-// Este archivo gestiona la autenticación automática en todas las plataformas por medio de la base de datos central, y lo hace derivando dinámicamente la obtención de tokens al archivo específico de cada plataforma.
+// Este archivo gestiona la autenticación automática en todas las plataformas.
 
-async function getPlatformAccessToken(platformName, contextData = {}) {
+export async function getPlatformAccessToken(platformName, contextData = {}) {
     try {
-        // 1. Localización dinámica del módulo (Ruta según la estructura de proyecto)
+        // 1. Localización dinámica usando import() (estándar ESM)
+        // La ruta es relativa a este archivo: ./ghl/auth/get-access-token.js
         const modulePath = `./${platformName}/auth/get-access-token.js`;
-        const platformModule = require(modulePath);
+        
+        // 2. Importación dinámica del módulo de la plataforma
+        const platformModule = await import(modulePath);
 
-        // 2. Delegación total: Pasamos el 'contextData' tal cual 
-        // Cada plataforma decidirá si necesita el location_id, tokens de la DB, etc.
+        // 3. Delegación: Accedemos a la función exportada en get-access-token.js
+        // Pasamos el 'contextData' (que contiene el location_id)
         return await platformModule.getAccessToken(contextData);
 
     } catch (error) {
-        // El manager solo reporta que la delegación falló
+        // Reportamos el error detallado para debug
+        console.error(`[AuthManager Error]:`, error);
         throw new Error(`[AuthManager] Error en ${platformName}: ${error.message}`);
     }
 }
