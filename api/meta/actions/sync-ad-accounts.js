@@ -1,5 +1,5 @@
 import supabase from '../../_supabase.js';
-import { getPlatformAccessToken } from '../../auth-manager.js';
+import { getPlatformAccessToken } from '../../_auth-manager.js';
 
 export default async function syncAdAccounts({ locationId }) {
   const token = await getPlatformAccessToken('meta');
