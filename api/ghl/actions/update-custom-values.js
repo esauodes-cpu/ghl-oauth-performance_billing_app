@@ -1,5 +1,5 @@
 // api/ghl/actions/update-custom-values.js
-import { getPlatformAccessToken } from '../../auth-manager.js';
+import { getPlatformAccessToken } from '../../_auth-manager.js';
 
 const GHL_BASE_URL = 'https://services.leadconnectorhq.com';
 
