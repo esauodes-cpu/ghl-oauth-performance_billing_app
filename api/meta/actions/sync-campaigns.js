@@ -1,5 +1,5 @@
 import supabase from '../../_supabase.js';
-import { getPlatformAccessToken } from '../../auth-manager.js';
+import { getPlatformAccessToken } from '../../_auth-manager.js';
 
 const HOURS_24 = 24 * 60 * 60;
 
