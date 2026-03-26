@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Backend para Performance Billing en GHL y Meta Ads",
   "type": "module",
-  "main": "api/auth-manager.js",
+  "main": "api/_auth-manager.js",
   "scripts": {
-    "start": "node api/auth-manager.js"
+    "start": "node api/_auth-manager.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0"
