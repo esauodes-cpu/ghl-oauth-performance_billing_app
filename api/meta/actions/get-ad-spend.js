@@ -1,7 +1,7 @@
 // api/meta/actions/get-ad-spend.js
 
 //versión 1:1
-import { getPlatformAccessToken } from '../../auth-manager.js';
+import { getPlatformAccessToken } from '../../_auth-manager.js';
 
 export default async function getAdSpend({ campaignIds }) {
   if (!campaignIds?.length) return 0;
