@@ -2,6 +2,10 @@
 import supabase from './_supabase.js';
 
 export default async function handler(req, res) {
+  // Keepalive ping to prevent Supabase free tier from pausing
+  const { error: pingError } = await supabase.from('clients').select('*').limit(1);
+  if (pingError) console.log('[sync-all] keepalive ping error:', pingError.message);
+
   try {
     const authHeader = req.headers.authorization;
 
